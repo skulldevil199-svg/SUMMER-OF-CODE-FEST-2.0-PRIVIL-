@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronos Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6, .bebas {
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        /* Hide Scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* Custom Borders for that stark architectural look */
+        .border-bw {
+            border-width: 2px;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox input:checked + div {
+            background-color: #000000;
+        }
+        
+        /* Utility */
+        .strike { 
+            text-decoration: line-through; 
+            opacity: 0.3; 
+            transition: all 0.4s ease;
+        }
+
+        /* NEW: Zen Morph Animation */
+        @keyframes morph {
+            0%, 100% { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
+            34% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
+            67% { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
+        }
+        .zen-active {
+            animation: morph 8s ease-in-out infinite;
+            background-color: black;
+        }
+
+        input:focus {
+            outline: none;
+            border-bottom: 2px solid #000;
+        }
+
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 16px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+
+        #toast.show-toast {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="flex h-screen w-screen overflow-hidden">
+
+    <nav class="w-24 md:w-64 h-full flex flex-col justify-between py-12 px-4 md:px-12 border-r-bw border-black flex-shrink-0 relative z-10 bg-white overflow-y-auto">
+        <div class="space-y-4 md:space-y-8 flex flex-col items-start">
+            <h1 class="bebas text-base md:text-xl tracking-widest uppercase leading-tight mb-2 md:mb-4">Privil Chronos<br class="hidden md:block"> Study Planner</h1>
+            <div class="text-4xl md:text-8xl cursor-pointer transition-colors duration-300 nav-item bebas text-black" onclick="switchTab('work', this)">
+                <span class="text-xs md:text-sm font-sans tracking-widest absolute -mt-2 -ml-4 hidden md:block">01</span>
+                WORK
+            </div>
+            <div class="text-4xl md:text-8xl cursor-pointer transition-colors duration-300 nav-item bebas text-gray-300" onclick="switchTab('schedule', this)">
+                <span class="text-xs md:text-sm font-sans tracking-widest absolute -mt-2 -ml-4 hidden md:block">02</span>
+                WEEK
+            </div>
+            <div class="text-4xl md:text-8xl cursor-pointer transition-colors duration-300 nav-item bebas text-gray-300" onclick="switchTab('exams', this)">
+                <span class="text-xs md:text-sm font-sans tracking-widest absolute -mt-2 -ml-4 hidden md:block">03</span>
+                EXAMS
+            </div>
+            <div class="text-4xl md:text-8xl cursor-pointer transition-colors duration-300 nav-item bebas text-gray-300" onclick="switchTab('habits', this)">
+                <span class="text-xs md:text-sm font-sans tracking-widest absolute -mt-2 -ml-4 hidden md:block">04</span>
+                HABITS
+            </div>
+            <div class="text-4xl md:text-8xl cursor-pointer transition-colors duration-300 nav-item bebas text-gray-300" onclick="switchTab('relax', this)">
+                <span class="text-xs md:text-sm font-sans tracking-widest absolute -mt-2 -ml-4 hidden md:block">05</span>
+                RELAX
+            </div>
+        </div>
+        
+        <div class="text-sm font-bold tracking-widest flex flex-col gap-4 items-start">
+            <button class="hover:underline hover:text-gray-500 uppercase" onclick="showToast('Settings synced.')">SYNC</button>
+            <button class="hover:underline hover:text-gray-500 uppercase" onclick="window.open('https://github.com/minmon6767/Chronos-Workspace-Study-Agent', '_blank')">PROFILE</button>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto relative p-8 md:p-16">
+        
+        <!-- ================= WORK TAB ================= -->
+        <section id="work" class="tab-content flex flex-col gap-12 max-w-5xl">
+            
+            <!-- NEW: Priority Zero -->
+            <div>
+                <p class="text-sm font-bold tracking-widest uppercase mb-2">Focus of the day</p>
+                <input type="text" id="focusInput" placeholder="WHAT IS THE ONE THING YOU MUST ACCOMPLISH TODAY?" class="w-full bg-transparent border-b-bw border-black text-3xl md:text-5xl uppercase tracking-tight pb-2 font-bebas placeholder-gray-300" onchange="generateAgentPlan()">
+            </div>
+
+            <!-- Performance Dashboard -->
+            <div class="border-b-bw border-black pb-8">
+                <h2 class="text-6xl tracking-tight mb-4 bebas">STUDY PERFORMANCE</h2>
+                <div class="grid grid-cols-3 gap-8">
+                    <div>
+                        <p class="text-sm font-bold tracking-widest uppercase mb-1">Weekly Tasks</p>
+                        <p class="text-4xl bebas" id="statWeeklyTasks">0 / 0</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold tracking-widest uppercase mb-1">Focus Goals</p>
+                        <p class="text-4xl bebas" id="statFocusGoals">—</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold tracking-widest uppercase mb-1">Agent Note</p>
+                        <p class="text-sm font-medium italic" id="agentNoteText">Add tasks and deadlines, then generate a plan to see agent insights here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Plan -->
+            <div>
+                <div class="flex items-center gap-4 mb-6 flex-wrap">
+                    <h2 class="text-4xl md:text-7xl tracking-tighter uppercase leading-none bebas">AGENT PLAN</h2>
+                    <span class="text-xs border border-black px-2 py-1 font-bold tracking-widest uppercase">Draft</span>
+                    <button class="md:ml-auto border-bw border-black px-6 py-2 text-sm font-bold hover:bg-black hover:text-white uppercase transition-colors bebas tracking-widest" onclick="generateAgentPlan()">Generate Plan</button>
+                </div>
+
+                <div class="flex flex-wrap items-end gap-6 mb-6 pb-6 border-b border-black">
+                    <div>
+                        <label for="prefStudyHours" class="block text-xs font-bold tracking-widest uppercase mb-1">Hours available today</label>
+                        <input type="number" id="prefStudyHours" value="4" min="0.5" max="16" step="0.5" class="w-24 bg-transparent border-b-bw border-black text-2xl pb-1 bebas">
+                    </div>
+                    <div>
+                        <label for="prefStartTime" class="block text-xs font-bold tracking-widest uppercase mb-1">Start studying at</label>
+                        <input type="time" id="prefStartTime" value="09:00" class="w-32 bg-transparent border-b-bw border-black text-2xl pb-1 bebas">
+                    </div>
+                    <p class="text-xs text-gray-400 uppercase tracking-widest max-w-xs">Agent uses this, plus each topic's type and progress, to size study blocks and place them on your clock.</p>
+                </div>
+                
+                <div class="space-y-4" id="agentPlanList">
+                    <p class="text-sm text-gray-400 uppercase tracking-widest py-4" id="agentPlanEmptyState">No plan yet. Add manual tasks or deadlines below, then hit "Generate Plan".</p>
+                </div>
+            </div>
+
+            <!-- Manual Tasks -->
+            <div>
+                <h2 class="text-4xl md:text-7xl tracking-tighter uppercase leading-none mb-6 bebas mt-8">MANUAL TASKS</h2>
+                
+                <div class="flex gap-4 mb-8">
+                    <input type="text" id="newTaskInput" placeholder="ENTER NEW TASK..." class="flex-1 bg-transparent border-b-bw border-black text-2xl md:text-4xl uppercase tracking-tight pb-2 font-bebas placeholder-gray-300" onkeypress="addTask(event)">
+                    <button class="border-bw border-black px-8 py-2 text-xl font-bold hover:bg-black hover:text-white transition-colors bebas" onclick="addTask()">ADD</button>
+                </div>
+
+                <div class="space-y-4" id="manualTaskList">
+                    <p class="text-sm text-gray-400 uppercase tracking-widest py-2" id="manualTaskEmptyState">No tasks yet. Add one above.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= WEEK TAB ================= -->
+        <section id="schedule" class="tab-content hidden h-full max-w-6xl">
+            <h2 class="text-5xl md:text-8xl tracking-tighter uppercase leading-none mb-12 bebas">WEEKLY AGENDA</h2>
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-4 h-[70%]">
+                
+                <!-- Monday -->
+                <div class="border-t-bw border-black pt-4 flex flex-col gap-4">
+                    <h3 class="text-3xl font-bold uppercase tracking-tight bebas">MON</h3>
+                    <input type="text" id="input-mon" class="w-full border-b border-black text-sm uppercase pb-1" placeholder="+ ADD ITEM" onkeypress="addScheduleItem(event, 'mon')">
+                    <div id="list-mon" class="flex flex-col gap-2"></div>
+                </div>
+
+                <!-- Tuesday -->
+                <div class="border-t-bw border-black pt-4 flex flex-col gap-4">
+                    <h3 class="text-3xl font-bold uppercase tracking-tight bebas">TUE</h3>
+                    <input type="text" id="input-tue" class="w-full border-b border-black text-sm uppercase pb-1" placeholder="+ ADD ITEM" onkeypress="addScheduleItem(event, 'tue')">
+                    <div id="list-tue" class="flex flex-col gap-2"></div>
+                </div>
+
+                <!-- Wednesday -->
+                <div class="border-t-bw border-black pt-4 flex flex-col gap-4">
+                    <h3 class="text-3xl font-bold uppercase tracking-tight bebas">WED</h3>
+                    <input type="text" id="input-wed" class="w-full border-b border-black text-sm uppercase pb-1" placeholder="+ ADD ITEM" onkeypress="addScheduleItem(event, 'wed')">
+                    <div id="list-wed" class="flex flex-col gap-2"></div>
+                </div>
+
+                <!-- Thursday -->
+                <div class="border-t-bw border-black pt-4 flex flex-col gap-4">
+                    <h3 class="text-3xl font-bold uppercase tracking-tight bebas">THU</h3>
+                    <input type="text" id="input-thu" class="w-full border-b border-black text-sm uppercase pb-1" placeholder="+ ADD ITEM" onkeypress="addScheduleItem(event, 'thu')">
+                    <div id="list-thu" class="flex flex-col gap-2"></div>
+                </div>
+
+                <!-- Friday -->
+                <div class="border-t-bw border-black pt-4 flex flex-col gap-4">
+                    <h3 class="text-3xl font-bold uppercase tracking-tight bebas">FRI</h3>
+                    <input type="text" id="input-fri" class="w-full border-b border-black text-sm uppercase pb-1" placeholder="+ ADD ITEM" onkeypress="addScheduleItem(event, 'fri')">
+                    <div id="list-fri" class="flex flex-col gap-2"></div>
+                </div>
+
+                <!-- Saturday -->
+                <div class="border-t-bw border-black pt-4 flex flex-col gap-4 opacity-70">
+                    <h3 class="text-3xl font-bold uppercase tracking-tight bebas">SAT</h3>
+                    <input type="text" id="input-sat" class="w-full border-b border-black text-sm uppercase pb-1" placeholder="+ ADD ITEM" onkeypress="addScheduleItem(event, 'sat')">
+                    <div id="list-sat" class="flex flex-col gap-2"></div>
+                </div>
+
+                <!-- Sunday -->
+                <div class="border-t-bw border-black pt-4 flex flex-col gap-4 opacity-70">
+                    <h3 class="text-3xl font-bold uppercase tracking-tight bebas">SUN</h3>
+                    <input type="text" id="input-sun" class="w-full border-b border-black text-sm uppercase pb-1" placeholder="+ ADD ITEM" onkeypress="addScheduleItem(event, 'sun')">
+                    <div id="list-sun" class="flex flex-col gap-2"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= EXAMS TAB ================= -->
+        <section id="exams" class="tab-content hidden max-w-4xl">
+            <h2 class="text-5xl md:text-8xl tracking-tighter uppercase leading-none mb-12 bebas">DEADLINES</h2>
+            
+            <div class="mb-12 flex flex-col md:flex-row gap-4 border-b-bw border-black pb-8">
+                <input type="text" id="newDeadlineName" placeholder="EXAM/ASSIGNMENT NAME" class="flex-1 bg-transparent border-b border-black text-xl md:text-2xl uppercase tracking-tight pb-2 placeholder-gray-300 bebas" onkeypress="addDeadline(event)">
+                
+                <select id="newDeadlineType" class="bg-transparent border-b border-black text-xl uppercase tracking-tight pb-2 bebas cursor-pointer">
+                    <option value="EXAM">EXAM</option>
+                    <option value="ASSIGNMENT">ASSIGNMENT</option>
+                    <option value="PROJECT">PROJECT</option>
+                </select>
+
+                <input type="date" id="newDeadlineDate" class="bg-transparent border-b border-black text-sm md:text-base uppercase tracking-tight pb-2 bebas cursor-pointer" title="Due date (optional, but needed for the agent to schedule study time)">
+
+                <button class="border-bw border-black px-6 py-2 text-xl font-bold hover:bg-black hover:text-white transition-colors bebas" onclick="addDeadline()">ADD</button>
+            </div>
+
+            <div class="space-y-8" id="deadlinesList">
+                <p class="text-sm text-gray-400 uppercase tracking-widest py-4" id="deadlinesEmptyState">No deadlines yet. Add an exam, assignment, or project above.</p>
+            </div>
+        </section>
+
+        <!-- ================= HABITS TAB ================= -->
+        <section id="habits" class="tab-content hidden gap-12 w-full max-w-6xl">
+            <!-- Left Side: Habits list -->
+            <div class="flex-1 flex flex-col">
+                <h2 class="text-5xl md:text-8xl tracking-tighter uppercase leading-none mb-8 bebas">HABITS</h2>
+                
+                <div class="flex gap-4 mb-8">
+                    <input type="text" id="newHabitInput" placeholder="ADD HABIT..." class="flex-1 bg-transparent border-b-bw border-black text-2xl uppercase tracking-tight pb-2 bebas placeholder-gray-300" onkeypress="addCustomHabit(event)">
+                    <button class="border-bw border-black px-6 py-2 text-xl font-bold hover:bg-black hover:text-white transition-colors bebas" onclick="addCustomHabit()">ADD</button>
+                </div>
+
+                <div class="flex flex-col border-t-bw border-black" id="habitsList">
+                    <p class="text-sm text-gray-400 uppercase tracking-widest py-4" id="habitsEmptyState">No habits yet. Add one above.</p>
+                </div>
+
+                <!-- Quote Button embedded in Habits view -->
+                <button onclick="openQuote()" class="mt-auto mb-12 border-bw border-black w-full py-6 text-2xl tracking-widest uppercase hover:bg-black hover:text-white transition-colors bebas">
+                    GET DAILY INSPIRATION
+                </button>
+            </div>
+
+            <!-- Right Side: Notes -->
+            <div class="flex-1 border-l-bw border-black pl-12 flex flex-col">
+                <h2 class="text-4xl tracking-tighter uppercase leading-none mb-8 bebas">SCRATCHPAD</h2>
+                <textarea class="flex-1 w-full h-full bg-transparent resize-none outline-none text-xl leading-relaxed font-sans" placeholder="Brain dump..."></textarea>
+            </div>
+        </section>
+
+        <!-- ================= RELAX TAB ================= -->
+        <section id="relax" class="tab-content hidden gap-8 w-full max-w-6xl">
+            <!-- Top Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Pomodoro -->
+                <div class="border-bw border-black p-8 flex flex-col items-center justify-center min-h-[300px]">
+                    <h3 class="text-xl font-bold tracking-widest uppercase mb-8 w-full border-b border-black pb-2">POMODORO TIMER</h3>
+                    <div class="text-7xl md:text-9xl font-bold tracking-tighter mb-4 bebas" id="timerDisplay">25:00</div>
+                    <div class="flex gap-4 mb-4">
+                        <button class="text-sm font-bold uppercase tracking-widest hover:underline" onclick="setTimer(25)">WORK (25M)</button>
+                        <span class="text-gray-300">|</span>
+                        <button class="text-sm font-bold uppercase tracking-widest hover:underline" onclick="setTimer(5)">BREAK (5M)</button>
+                    </div>
+                    <div class="flex gap-4">
+                        <button id="pomodoroBtn" class="border-bw border-black px-8 py-3 text-xl font-bold uppercase hover:bg-black hover:text-white transition-colors bebas" onclick="toggleTimer()">PLAY</button>
+                        <button class="border-bw border-black px-8 py-3 text-xl font-bold uppercase hover:bg-black hover:text-white transition-colors bebas" onclick="resetTimer()">RESET</button>
+                    </div>
+                </div>
+
+                <!-- 4-7-8 Breathing -->
+                <div class="border-bw border-black p-8 flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
+                    <h3 class="text-xl font-bold tracking-widest uppercase mb-8 w-full border-b border-black pb-2 absolute top-8 left-8 right-8 w-auto">4-7-8 BREATHING</h3>
+                    <div id="breathCircle" class="w-32 h-32 border-bw border-black rounded-full flex items-center justify-center transition-transform duration-[4000ms] ease-in-out">
+                        <span id="breathText" class="text-xl font-bold tracking-widest text-center bebas">START</span>
+                    </div>
+                    <button class="absolute bottom-8 border-bw border-black px-6 py-2 text-sm font-bold uppercase hover:bg-black hover:text-white transition-colors" onclick="startBreathing()">BEGIN</button>
+                </div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                <!-- 5-4-3-2-1 Grounding -->
+                <div class="border-bw border-black p-8 flex flex-col">
+                    <h3 class="text-xl font-bold tracking-widest uppercase mb-6 border-b border-black pb-2">GROUNDING EXERCISE</h3>
+                    <div class="space-y-4 text-xl uppercase bebas tracking-tight">
+                        <div class="flex items-center gap-4">
+                            <label class="custom-checkbox cursor-pointer relative w-5 h-5 border-bw border-black flex-shrink-0">
+                                <input type="checkbox" class="opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                                <div class="w-full h-full bg-white"></div>
+                            </label>
+                            <span class="task-text transition-all duration-300">5 Things you can see</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="custom-checkbox cursor-pointer relative w-5 h-5 border-bw border-black flex-shrink-0">
+                                <input type="checkbox" class="opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                                <div class="w-full h-full bg-white"></div>
+                            </label>
+                            <span class="task-text transition-all duration-300">4 Things you can feel</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="custom-checkbox cursor-pointer relative w-5 h-5 border-bw border-black flex-shrink-0">
+                                <input type="checkbox" class="opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                                <div class="w-full h-full bg-white"></div>
+                            </label>
+                            <span class="task-text transition-all duration-300">3 Things you can hear</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="custom-checkbox cursor-pointer relative w-5 h-5 border-bw border-black flex-shrink-0">
+                                <input type="checkbox" class="opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                                <div class="w-full h-full bg-white"></div>
+                            </label>
+                            <span class="task-text transition-all duration-300">2 Things you can smell</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="custom-checkbox cursor-pointer relative w-5 h-5 border-bw border-black flex-shrink-0">
+                                <input type="checkbox" class="opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                                <div class="w-full h-full bg-white"></div>
+                            </label>
+                            <span class="task-text transition-all duration-300">1 Thing you can taste</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zen Focus -->
+                <div class="border-bw border-black p-8 flex flex-col items-center justify-center min-h-[250px] relative">
+                    <h3 class="text-xl font-bold tracking-widest uppercase mb-8 w-full border-b border-black pb-2 absolute top-8 left-8 right-8 w-auto">ZEN FOCUS</h3>
+                    <div id="zenBox" class="w-32 h-32 border-bw border-black transition-all duration-700 ease-in-out"></div>
+                    <button class="absolute bottom-8 border-bw border-black px-6 py-2 text-sm font-bold uppercase hover:bg-black hover:text-white transition-colors" onclick="toggleZen()">ENTER FLOW</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- OVERLAY QUOTE -->
+    <div id="quoteOverlay" class="hidden fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center p-8 cursor-pointer" onclick="this.classList.add('hidden')">
+        <div class="max-w-5xl w-full text-center">
+            <p id="quoteText" class="text-6xl md:text-8xl font-bold uppercase tracking-tighter leading-none mb-12 text-black bebas">"PLACEHOLDER QUOTE"</p>
+            <p class="text-xl tracking-widest uppercase border-t-bw border-black pt-4 inline-block text-black">CLICK ANYWHERE TO CLOSE</p>
+        </div>
+    </div>
+
+    <script>
+        // --- Custom Toast Notification ---
+        function showToast(message) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = 'toast';
+                document.body.appendChild(toast);
+            }
+            toast.innerText = message;
+            
+            toast.classList.remove('show-toast');
+            void toast.offsetWidth; // trigger reflow
+            toast.classList.add('show-toast');
+            
+            if(toast.timeoutId) clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.classList.remove('show-toast');
+            }, 3000);
+        }
+
+        // --- Navigation Logic ---
+        function switchTab(tabId, element) {
+            // Update Active Tab Styling
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('text-black');
+                el.classList.add('text-gray-300');
+            });
+            
+            if (element) {
+                element.classList.remove('text-gray-300');
+                element.classList.add('text-black');
+            }
+
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('flex', 'grid');
+            });
+
+            // Show selected tab content and restore layouts
+            const activeTab = document.getElementById(tabId);
+            if (activeTab) {
+                activeTab.classList.remove('hidden');
+                
+                // Restore layout depending on the tab
+                if (tabId === 'work' || tabId === 'habits') {
+                    activeTab.classList.add('flex');
+                } else if (tabId === 'relax') {
+                    activeTab.classList.add('flex', 'flex-col');
+                }
+            }
+        }
+
+        // --- Shared helpers ---
+        function clearEmptyState(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.innerText = str;
+            return div.innerHTML;
+        }
+
+        function formatDueLabel(dateStr) {
+            const days = daysUntilDate(dateStr);
+            const due = new Date(dateStr + 'T00:00:00');
+            const dateText = due.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            if (days === null) return '';
+            if (days < 0) return `DUE ${dateText} — OVERDUE`;
+            if (days === 0) return `DUE ${dateText} — TODAY`;
+            if (days === 1) return `DUE ${dateText} — TOMORROW`;
+            return `DUE ${dateText} — ${days} DAYS LEFT`;
+        }
+
+        function daysUntilDate(dateStr) {
+            if (!dateStr) return null;
+            const due = new Date(dateStr + 'T23:59:59');
+            const now = new Date();
+            const diffMs = due.setHours(23,59,59,999) - now.setHours(0,0,0,0);
+            return Math.round(diffMs / (1000 * 60 * 60 * 24));
+        }
+
+        // --- Work Tasks ---
+        function addTask(event) {
+            if (event && event.type === 'keypress' && event.key !== 'Enter') return;
+            const input = document.getElementById('newTaskInput');
+            const taskText = input.value.trim();
+            if (!taskText) return;
+
+            clearEmptyState('manualTaskEmptyState');
+
+            const list = document.getElementById('manualTaskList');
+            const newItem = document.createElement('div');
+            newItem.className = 'flex items-center gap-4 py-2 border-b-bw border-black';
+            newItem.innerHTML = `
+                <label class="custom-checkbox cursor-pointer relative w-6 h-6 border-bw border-black flex-shrink-0">
+                    <input type="checkbox" class="opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                    <div class="w-full h-full bg-white"></div>
+                </label>
+                <span class="text-xl md:text-3xl uppercase tracking-tight task-text transition-all duration-300 bebas">${escapeHtml(taskText)}</span>
+            `;
+            list.appendChild(newItem);
+            input.value = '';
+            showToast("Task added");
+            computeStats();
+        }
+
+        function toggleTask(checkbox) {
+            const text = checkbox.closest('.flex').querySelector('.task-text');
+            if (checkbox.checked) {
+                text.classList.add('strike');
+            } else {
+                text.classList.remove('strike');
+            }
+            computeStats();
+        }
+
+        // --- Week Schedule ---
+        function addScheduleItem(event, dayId) {
+            if (event && event.type === 'keypress' && event.key !== 'Enter') return;
+            const input = document.getElementById(`input-${dayId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const list = document.getElementById(`list-${dayId}`);
+            const item = document.createElement('div');
+            item.className = 'p-2 border-bw border-black text-lg font-bebas uppercase cursor-pointer hover:bg-black hover:text-white transition-colors duration-200 bebas';
+            item.innerText = text;
+            item.onclick = function() {
+                this.remove();
+                showToast("Schedule item removed");
+            };
+            
+            list.appendChild(item);
+            input.value = '';
+            showToast("Item added");
+        }
+
+        // --- Exams & Deadlines ---
+        function addDeadline(event) {
+            if (event && event.type === 'keypress' && event.key !== 'Enter') return;
+            const nameInput = document.getElementById('newDeadlineName');
+            const typeInput = document.getElementById('newDeadlineType');
+            const dateInput = document.getElementById('newDeadlineDate');
+            
+            if (!nameInput.value.trim()) {
+                showToast("Please enter a name");
+                return;
+            }
+
+            clearEmptyState('deadlinesEmptyState');
+
+            const list = document.getElementById('deadlinesList');
+            const newItem = document.createElement('div');
+            newItem.className = 'border-b-bw border-t-bw border-black py-6 flex flex-col gap-4 -mt-[2px]';
+            newItem.dataset.due = dateInput.value || '';
+
+            const dueLabel = dateInput.value ? formatDueLabel(dateInput.value) : '';
+            
+            newItem.innerHTML = `
+                <div class="flex justify-between items-end">
+                    <div>
+                        <span class="text-xs font-bold px-2 py-1 bg-black text-white mb-2 inline-block">${escapeHtml(typeInput.value)}</span>
+                        <h3 class="text-3xl md:text-5xl tracking-tight uppercase bebas">${escapeHtml(nameInput.value)}</h3>
+                        ${dueLabel ? `<p class="text-xs font-bold tracking-widest uppercase text-gray-500 mt-1 due-label">${dueLabel}</p>` : `<p class="text-xs font-bold tracking-widest uppercase text-gray-300 mt-1 due-label">NO DUE DATE SET</p>`}
+                    </div>
+                    <div class="text-2xl font-bold tracking-tight uppercase bebas text-right">
+                        <span class="text-sm tracking-widest block mb-1">PROGRESS</span>
+                        <span class="progress-text">0%</span>
+                    </div>
+                </div>
+                <div class="w-full h-8 border-bw border-black relative cursor-pointer group" onclick="updateProgress(this)">
+                    <div class="h-full bg-black transition-all duration-300 pointer-events-none flex items-center justify-end pr-2 overflow-hidden" style="width: 0%">
+                        <span class="text-white text-xs font-bold tracking-widest whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">CLICK TO UPDATE</span>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <span class="text-black text-xs font-bold tracking-widest mix-blend-difference group-hover:opacity-0 transition-opacity">CLICK TO UPDATE</span>
+                    </div>
+                </div>
+            `;
+            list.appendChild(newItem);
+            nameInput.value = '';
+            dateInput.value = '';
+            showToast(`${typeInput.value} added`);
+            computeStats();
+        }
+
+        function updateProgress(element) {
+            const bar = element.firstElementChild;
+            const textElement = element.previousElementSibling.querySelector('.progress-text');
+            
+            let currentWidth = parseInt(bar.style.width) || 0;
+            let newWidth = currentWidth + 25;
+            if (newWidth > 100) newWidth = 0;
+            
+            bar.style.width = newWidth + '%';
+            if (textElement) {
+                textElement.innerText = newWidth + '%';
+            }
+            computeStats();
+        }
+
+        // --- Habits ---
+        function addCustomHabit(event) {
+            if (event && event.type === 'keypress' && event.key !== 'Enter') return;
+            const input = document.getElementById('newHabitInput');
+            const habitText = input.value.trim();
+            if (!habitText) return;
+
+            clearEmptyState('habitsEmptyState');
+
+            const list = document.getElementById('habitsList');
+            const newItem = document.createElement('div');
+            newItem.className = 'flex items-center justify-between py-4 border-b-bw border-black';
+            newItem.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <label class="custom-checkbox cursor-pointer relative w-6 h-6 border-bw border-black flex-shrink-0">
+                        <input type="checkbox" class="opacity-0 absolute h-0 w-0" onchange="toggleHabit(this)">
+                        <div class="w-full h-full bg-white"></div>
+                    </label>
+                    <span class="text-3xl uppercase tracking-tight bebas">${escapeHtml(habitText)}</span>
+                </div>
+                <div class="text-sm font-bold tracking-widest uppercase">
+                    STREAK: <span class="streak-count text-2xl bebas">0</span>
+                </div>
+            `;
+            list.appendChild(newItem);
+            input.value = '';
+            showToast("Habit added");
+        }
+
+        function toggleHabit(checkbox) {
+            const streakElement = checkbox.closest('div.flex.items-center.justify-between').querySelector('.streak-count');
+            let streak = parseInt(streakElement.innerText);
+            if (checkbox.checked) {
+                streak++;
+                showToast("Habit tracked!");
+            } else {
+                streak = Math.max(0, streak - 1);
+            }
+            streakElement.innerText = streak;
+        }
+
+        // --- Quotes ---
+        const quotes = [
+            "The secret of your future is hidden in your daily routine.",
+            "Discipline is choosing between what you want now and what you want most.",
+            "Don't stop when you're tired. Stop when you're done.",
+            "Small daily improvements over time lead to stunning results.",
+            "Focus on the step in front of you, not the whole staircase.",
+            "Amateurs sit and wait for inspiration, the rest of us just get up and go to work."
+        ];
+
+        function openQuote() {
+            const overlay = document.getElementById('quoteOverlay');
+            const textContainer = document.getElementById('quoteText');
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            textContainer.innerText = '"' + randomQuote + '"';
+            overlay.classList.remove('hidden');
+        }
+
+        // --- Pomodoro ---
+        let timerInterval;
+        let currentDuration = 25 * 60;
+        let timeLeft = 25 * 60;
+        let isRunning = false;
+
+        function setTimer(minutes) {
+            clearInterval(timerInterval);
+            isRunning = false;
+            currentDuration = minutes * 60;
+            timeLeft = currentDuration;
+            document.getElementById('pomodoroBtn').innerText = 'PLAY';
+            updateDisplay();
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('pomodoroBtn');
+            if (isRunning) {
+                clearInterval(timerInterval);
+                btn.innerText = 'PLAY';
+                isRunning = false;
+            } else {
+                timerInterval = setInterval(updateTimer, 1000);
+                btn.innerText = 'PAUSE';
+                isRunning = true;
+            }
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('timerDisplay');
+            const minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            if (seconds < 10) seconds = '0' + seconds;
+            display.innerText = `${minutes}:${seconds}`;
+        }
+
+        function updateTimer() {
+            if (timeLeft === 0) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                document.getElementById('pomodoroBtn').innerText = 'PLAY';
+                showToast("Session Complete!");
+                timeLeft = currentDuration;
+                updateDisplay();
+            } else {
+                timeLeft--;
+                updateDisplay();
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = currentDuration;
+            updateDisplay();
+            document.getElementById('pomodoroBtn').innerText = 'PLAY';
+        }
+
+        // --- Breathing ---
+        let breathInterval;
+        function startBreathing() {
+            clearInterval(breathInterval);
+            const circle = document.getElementById('breathCircle');
+            const text = document.getElementById('breathText');
+            
+            const breathe = () => {
+                // Inhale (4s)
+                text.innerText = 'INHALE (4)';
+                circle.style.transitionDuration = '4000ms';
+                circle.style.transform = 'scale(1.5)';
+                circle.style.backgroundColor = '#f3f4f6';
+                
+                setTimeout(() => {
+                    // Hold (7s)
+                    text.innerText = 'HOLD (7)';
+                    circle.style.transitionDuration = '7000ms';
+                    
+                    setTimeout(() => {
+                        // Exhale (8s)
+                        text.innerText = 'EXHALE (8)';
+                        circle.style.transitionDuration = '8000ms';
+                        circle.style.transform = 'scale(1)';
+                        circle.style.backgroundColor = 'transparent';
+                    }, 7000);
+                    
+                }, 4000);
+            };
+            
+            breathe();
+            // Total cycle = 4 + 7 + 8 = 19 seconds
+            breathInterval = setInterval(breathe, 19000);
+            showToast("Follow the circle...");
+        }
+
+        // --- Performance Dashboard (driven by real data, no fake stats) ---
+        function computeStats() {
+            const taskSpans = document.querySelectorAll('#manualTaskList .task-text');
+            const total = taskSpans.length;
+            let completed = 0;
+            taskSpans.forEach(t => { if (t.classList.contains('strike')) completed++; });
+            const weeklyEl = document.getElementById('statWeeklyTasks');
+            if (weeklyEl) weeklyEl.innerText = `${completed} / ${total}`;
+
+            const progressEls = document.querySelectorAll('#deadlinesList .progress-text');
+            const focusEl = document.getElementById('statFocusGoals');
+            if (focusEl) {
+                if (progressEls.length === 0) {
+                    focusEl.innerText = '—';
+                } else {
+                    let sum = 0;
+                    progressEls.forEach(p => sum += parseInt(p.innerText) || 0);
+                    focusEl.innerText = Math.round(sum / progressEls.length) + '%';
+                }
+            }
+        }
+
+        // --- Agent Plan: estimates hours needed per topic and schedules them on the clock ---
+
+        function parseTimeToMinutes(hhmm) {
+            if (!hhmm) return 9 * 60;
+            const [h, m] = hhmm.split(':').map(Number);
+            return (h * 60) + (m || 0);
+        }
+
+        function minutesToLabel(totalMinutes) {
+            const wrapped = ((totalMinutes % (24 * 60)) + (24 * 60)) % (24 * 60);
+            let h = Math.floor(wrapped / 60);
+            const min = wrapped % 60;
+            const period = h >= 12 ? 'PM' : 'AM';
+            let h12 = h % 12;
+            if (h12 === 0) h12 = 12;
+            const minStr = min < 10 ? '0' + min : '' + min;
+            return `${h12}:${minStr} ${period}`;
+        }
+
+        // Estimates total hours a topic realistically needs, using its type,
+        // a light keyword read of the topic name for difficulty, and how much
+        // progress is already made — then returns what's LEFT to study.
+        function estimateRemainingHours(title, type, progress) {
+            const baseByType = { EXAM: 10, PROJECT: 14, ASSIGNMENT: 4, TASK: 2, FOCUS: 1.5 };
+            let base = baseByType[type] || 5;
+
+            const lower = (title || '').toLowerCase();
+            const hardKeywords = ['final', 'comprehensive', 'midterm', 'thesis', 'capstone', 'research', 'advanced', 'design', 'build', 'system'];
+            const easyKeywords = ['quiz', 'review', 'recap', 'worksheet', 'practice', 'reading', 'notes'];
+            let bonus = 0;
+            hardKeywords.forEach(k => { if (lower.includes(k)) bonus += 2; });
+            easyKeywords.forEach(k => { if (lower.includes(k)) bonus -= 1; });
+
+            const total = Math.max(1, base + bonus);
+            const remaining = total * (1 - (progress || 0) / 100);
+            return Math.max(0.5, Math.round(remaining * 4) / 4); // nearest 15 minutes
+        }
+
+        function generateAgentPlan() {
+            const planList = document.getElementById('agentPlanList');
+            planList.innerHTML = '';
+
+            const prefHoursInput = document.getElementById('prefStudyHours');
+            const prefStartInput = document.getElementById('prefStartTime');
+            const dailyBudgetHours = Math.max(0.5, parseFloat(prefHoursInput?.value) || 4);
+            const startMinutes = parseTimeToMinutes(prefStartInput?.value);
+
+            // --- Collect raw items from what the user has actually entered ---
+            const items = [];
+
+            const focusInput = document.getElementById('focusInput');
+            const focusText = focusInput ? focusInput.value.trim() : '';
+
+            const deadlineDivs = Array.from(document.querySelectorAll('#deadlinesList > div'));
+            const deadlines = deadlineDivs.map(div => {
+                const name = div.querySelector('h3')?.innerText.trim() || '';
+                const type = div.querySelector('span.text-xs.font-bold')?.innerText.trim() || 'DEADLINE';
+                const progress = parseInt(div.querySelector('.progress-text')?.innerText) || 0;
+                const due = div.dataset.due || '';
+                const daysLeft = due ? daysUntilDate(due) : null;
+                return { name, type, progress, daysLeft };
+            }).filter(d => d.name && d.progress < 100);
+
+            let focusMatched = false;
+            deadlines.forEach(d => {
+                const isFocus = focusText && d.name.toLowerCase() === focusText.toLowerCase();
+                if (isFocus) focusMatched = true;
+                const remainingHours = estimateRemainingHours(d.name, d.type, d.progress);
+                items.push({
+                    label: d.type,
+                    title: d.name,
+                    remainingHours,
+                    daysLeft: d.daysLeft,
+                    progress: d.progress,
+                    isFocus
+                });
+            });
+
+            const taskSpans = Array.from(document.querySelectorAll('#manualTaskList .task-text'));
+            const dealtWith = deadlines.map(d => d.name.toLowerCase());
+            taskSpans
+                .filter(t => !t.classList.contains('strike'))
+                .map(t => t.innerText.trim())
+                .forEach(taskText => {
+                    if (!taskText || dealtWith.includes(taskText.toLowerCase())) return;
+                    const isFocus = focusText && taskText.toLowerCase() === focusText.toLowerCase();
+                    if (isFocus) focusMatched = true;
+                    items.push({
+                        label: 'TASK',
+                        title: taskText,
+                        remainingHours: estimateRemainingHours(taskText, 'TASK', 0),
+                        daysLeft: null,
+                        progress: 0,
+                        isFocus
+                    });
+                });
+
+            if (focusText && !focusMatched) {
+                items.push({
+                    label: 'TODAY',
+                    title: focusText,
+                    remainingHours: estimateRemainingHours(focusText, 'FOCUS', 0),
+                    daysLeft: null,
+                    progress: 0,
+                    isFocus: true
+                });
+            }
+
+            if (items.length === 0) {
+                planList.innerHTML = '<p class="text-sm text-gray-400 uppercase tracking-widest py-4" id="agentPlanEmptyState">Nothing to plan yet. Add tasks, deadlines, or a daily focus above, then generate again.</p>';
+                const noteEl = document.getElementById('agentNoteText');
+                if (noteEl) noteEl.innerText = 'Add tasks and deadlines, then generate a plan to see agent insights here.';
+                showToast('Nothing to plan yet');
+                return;
+            }
+
+            // --- Work out how many hours per day each item needs ---
+            items.forEach(item => {
+                let perDayHours;
+                let urgencyNote;
+                if (item.daysLeft === null) {
+                    perDayHours = item.remainingHours;
+                    urgencyNote = `No due date set, so the agent is suggesting the full ${item.remainingHours} hrs estimated for this today.`;
+                } else if (item.daysLeft <= 0) {
+                    perDayHours = item.remainingHours;
+                    urgencyNote = item.daysLeft === 0
+                        ? `Due today. All ${item.remainingHours} remaining hrs are needed now.`
+                        : `Overdue — all ${item.remainingHours} remaining hrs should be prioritized immediately.`;
+                } else {
+                    perDayHours = Math.max(0.25, Math.round((item.remainingHours / item.daysLeft) * 4) / 4);
+                    urgencyNote = `${item.remainingHours} hrs remain over ${item.daysLeft} day${item.daysLeft === 1 ? '' : 's'} left, so ~${perDayHours} hrs/day keeps you on pace.`;
+                }
+                if (perDayHours > 6) {
+                    urgencyNote += ' That is more than fits in one realistic day — treat this as top priority and keep chipping away over the next few days too.';
+                    perDayHours = 6;
+                }
+                item.perDayHours = perDayHours;
+                item.urgencyNote = urgencyNote;
+            });
+
+            // --- Priority order: focus/matched item first, then soonest due date, then lowest progress ---
+            items.sort((a, b) => {
+                if (a.isFocus !== b.isFocus) return a.isFocus ? -1 : 1;
+                const aScore = a.daysLeft === null ? 999 : a.daysLeft;
+                const bScore = b.daysLeft === null ? 999 : b.daysLeft;
+                if (aScore !== bScore) return aScore - bScore;
+                return a.progress - b.progress;
+            });
+
+            // --- Place items on the clock within today's available hours ---
+            let pointer = startMinutes;
+            let remainingBudgetMinutes = Math.round(dailyBudgetHours * 60);
+            const BREAK_MINUTES = 10;
+            const scheduled = [];
+            const overflow = [];
+
+            items.slice(0, 7).forEach(item => {
+                const neededMinutes = Math.max(15, Math.round(item.perDayHours * 60));
+                if (remainingBudgetMinutes < 15) {
+                    overflow.push(item);
+                    return;
+                }
+                const durationMinutes = Math.min(neededMinutes, remainingBudgetMinutes);
+                const partial = durationMinutes < neededMinutes;
+                const timeLabel = `${minutesToLabel(pointer)} – ${minutesToLabel(pointer + durationMinutes)}`;
+                const hoursScheduled = Math.round((durationMinutes / 60) * 4) / 4;
+
+                let note = item.urgencyNote;
+                if (partial) {
+                    note += ` Only ${hoursScheduled} hrs fit in today's ${dailyBudgetHours} hr budget — continue the rest tomorrow.`;
+                }
+
+                scheduled.push({
+                    timeLabel,
+                    label: item.label,
+                    title: item.title,
+                    hours: hoursScheduled,
+                    note
+                });
+
+                pointer += durationMinutes + BREAK_MINUTES;
+                remainingBudgetMinutes -= durationMinutes;
+            });
+
+            items.slice(7).forEach(item => overflow.push(item));
+
+            overflow.forEach(item => {
+                scheduled.push({
+                    timeLabel: 'LATER',
+                    label: item.label,
+                    title: item.title,
+                    hours: item.perDayHours,
+                    note: `${item.urgencyNote} No room left in today's ${dailyBudgetHours} hr budget — plan this for tomorrow or increase your available hours above.`
+                });
+            });
+
+            scheduled.forEach(entry => {
+                const row = document.createElement('div');
+                row.className = 'border-t-bw border-b-bw border-black py-4 grid grid-cols-12 gap-4 items-center -mt-[2px]';
+                row.innerHTML = `
+                    <div class="col-span-3 md:col-span-2 text-sm md:text-lg font-bold tracking-tight uppercase leading-tight">${escapeHtml(entry.timeLabel)}</div>
+                    <div class="col-span-5 md:col-span-6">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs border border-black px-1.5 py-0.5 font-bold tracking-widest uppercase">${escapeHtml(entry.label)}</span>
+                            <span class="text-xs font-bold tracking-widest uppercase text-gray-500">${entry.hours} HRS</span>
+                        </div>
+                        <p class="text-xl md:text-2xl uppercase tracking-tight bebas">${escapeHtml(entry.title)}</p>
+                        <p class="text-xs font-mono mt-1 text-gray-500">Agent: ${escapeHtml(entry.note)}</p>
+                    </div>
+                    <div class="col-span-4 flex gap-2 justify-end">
+                        <button class="border-bw border-black px-4 py-2 text-sm font-bold hover:bg-black hover:text-white uppercase transition-colors" onclick="acceptPlanEntry(this)">Accept</button>
+                        <button class="border-bw border-black px-4 py-2 text-sm font-bold hover:bg-black hover:text-white uppercase transition-colors" onclick="rejectPlanEntry(this)">Reject</button>
+                    </div>
+                `;
+                row.dataset.title = entry.title;
+                row.dataset.acceptText = entry.timeLabel === 'LATER' ? entry.title : `${entry.title} (${entry.timeLabel}, ${entry.hours} hrs)`;
+                planList.appendChild(row);
+            });
+
+            const totalHoursToday = scheduled
+                .filter(e => e.timeLabel !== 'LATER')
+                .reduce((sum, e) => sum + e.hours, 0);
+            const first = scheduled[0];
+            const noteEl = document.getElementById('agentNoteText');
+            if (noteEl) {
+                noteEl.innerText = totalHoursToday > 0
+                    ? `"${Math.round(totalHoursToday * 4) / 4} hrs planned today. Start with ${first.title} at ${first.timeLabel.split(' – ')[0]}."`
+                    : `"Today's budget is full or too small — try raising 'Hours available today' above."`;
+            }
+
+            showToast('Plan generated');
+        }
+
+        function acceptPlanEntry(button) {
+            const row = button.closest('.grid');
+            const title = row.dataset.title || '';
+            const acceptText = row.dataset.acceptText || title;
+
+            const alreadyExists = Array.from(document.querySelectorAll('#manualTaskList .task-text'))
+                .some(t => t.innerText.trim().toLowerCase().startsWith(title.toLowerCase()));
+
+            if (!alreadyExists && title) {
+                clearEmptyState('manualTaskEmptyState');
+                const list = document.getElementById('manualTaskList');
+                const newItem = document.createElement('div');
+                newItem.className = 'flex items-center gap-4 py-2 border-b-bw border-black';
+                newItem.innerHTML = `
+                    <label class="custom-checkbox cursor-pointer relative w-6 h-6 border-bw border-black flex-shrink-0">
+                        <input type="checkbox" class="opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                        <div class="w-full h-full bg-white"></div>
+                    </label>
+                    <span class="text-xl md:text-3xl uppercase tracking-tight task-text transition-all duration-300 bebas">${escapeHtml(acceptText)}</span>
+                `;
+                list.appendChild(newItem);
+            }
+
+            removePlanRow(row);
+            showToast('Added to tasks');
+            computeStats();
+        }
+
+        function rejectPlanEntry(button) {
+            removePlanRow(button.closest('.grid'));
+            showToast('Rejected');
+        }
+
+        function removePlanRow(row) {
+            row.remove();
+            const planList = document.getElementById('agentPlanList');
+            if (!planList.querySelector('.grid')) {
+                planList.innerHTML = '<p class="text-sm text-gray-400 uppercase tracking-widest py-4" id="agentPlanEmptyState">No plan yet. Add manual tasks or deadlines above, then hit "Generate Plan".</p>';
+            }
+        }
+
+        // Initial state on load
+        computeStats();
+
+
+        // --- Zen Focus ---
+        function toggleZen() {
+            const box = document.getElementById('zenBox');
+            const isZen = box.classList.contains('zen-active');
+            
+            if (isZen) {
+                box.classList.remove('zen-active');
+                showToast("Flow broken");
+            } else {
+                box.classList.add('zen-active');
+                showToast("Entered Flow State");
+            }
+        }
+
+    </script>
+</body>
+</html>
