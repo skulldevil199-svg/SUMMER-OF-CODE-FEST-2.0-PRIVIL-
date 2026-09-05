@@ -1,78 +1,77 @@
-# ⚡ Privil "Chronos — Study Planner"
+# ⚡ Chronos — A Study Planner by Team Privil
 
-> **Your entire academic life, distilled into one stark, uncluttered black-and-white workspace.**
+> **Your whole academic life, condensed into one clean black-and-white workspace.**
 > No sign-ups. No backend. No bloat. Just open the file and start working.
 
-
----
-
-## 🎯 The Idea
-
-Every student's day is scattered across five different apps — a to-do list, a calendar, an exam tracker, a habit app, and a meditation app nobody actually opens. **Chronos** collapses all five into a single page, wrapped in a bold editorial design language that feels more like a design magazine than a SaaS dashboard.
-
-It's not trying to be "smart." It's trying to be **fast, honest, and distraction-free** — a workspace that respects your attention instead of fighting for it.
-
-Built in pure HTML, Tailwind, and vanilla JS. **Clone it, open `index.html`, and it just works.**
-
 🔗 **Live Demo:** [chronos-by-privil.netlify.app](https://chronos-by-privil.netlify.app/)
+
 ---
 
+## 🎯 Why Chronos Exists
+
+Most students juggle five separate apps just to stay organized — a to-do list, a calendar, a deadline tracker, a habit app, and a meditation app that never actually gets opened. Chronos merges all five into a single page, styled like an editorial design magazine rather than another SaaS dashboard.
+
+It isn't trying to be "smart." It's trying to be **fast, honest, and free of distraction** — a workspace built to respect your attention instead of competing for it.
+
+Built entirely with HTML, Tailwind, and vanilla JS. Clone it, open `index.html`, and it just works — no installs, no accounts, no setup.
+
+---
 
 ## 🖤 Design Philosophy
 
-Chronos is built around a deliberate **brutalist / architectural aesthetic**:
+Chronos leans into a deliberate **brutalist, architectural look**:
 
-- **Pure black & white** — no color noise, no gradients, no distractions
-- **Bebas Neue** for headers and numbers — big, confident, poster-like typography
-- **Inter** for body text — clean and legible
-- **Thick 2px borders** everywhere instead of shadows or rounded corners — the UI reads like ruled paper or architectural blueprints
-- **Numbered navigation** (01–05) — like chapters in a book, not tabs in an app
+- **Pure black & white** — no color noise, no gradients, no visual clutter
+- **Bebas Neue** for headers and numbers — bold, poster-style typography
+- **Inter** for body copy — clean and easy to read
+- **Thick 2px borders** in place of shadows or rounded corners, so the layout reads like ruled paper or a blueprint
+- **Numbered sections (01–05)** instead of conventional tabs, like chapters in a book
 
-The result feels less like a productivity tool and more like a **printed planner brought to life.**
+The end result feels less like a productivity app and more like a **printed planner brought to life on screen.**
 
 ---
 
-## 🧭 Feature Walkthrough
+## 🧭 Walkthrough
 
-### 01 — WORK
-Your command center for the day.
+### 01 — Work
+Your daily command center.
 
-- **Focus of the Day** — a single, oversized input at the top forces you to name *the one thing* that actually matters today (borrowed from the "most important task" productivity principle)
-- **Study Performance Dashboard** — live-style stats block showing weekly task completion, focus goal percentage, and an editable "Agent Note" summarizing your progress
-- **Agent Plan** — a draft queue of AI-suggested tasks (e.g. *"Split Physics Pset 4 into 2-hour blocks to avoid overload before Wednesday's lab"*) that you can **Accept** or **Reject** with one click — designed to simulate an AI co-planner without needing a live API connection
-- **Manual Tasks** — a classic checklist with satisfying strike-through animations when tasks are completed
+- **Focus of the Day** — one oversized input at the top pushes you to name the single task that matters most today
+- **Study Performance Dashboard** — a live stats panel tracking weekly completion, focus-goal percentage, and an editable "Agent Note" summarizing progress
+- **Agent Plan** — a queue of AI-style suggested tasks (e.g. *"split Physics Pset 4 into two-hour blocks before Wednesday's lab"*) that you can accept or reject with one click, simulating an AI co-planner without needing a live API
+- **Manual Tasks** — a classic checklist with satisfying strike-through animation on completion
 
-### 02 — WEEK
-A full **7-day agenda board**, Monday through Sunday, laid out side-by-side.
+### 02 — Week
+A full **7-day agenda board**, Monday through Sunday, side by side.
 
-- Add unlimited items to any day with a single keystroke (`Enter` to add)
-- Click any scheduled item to instantly remove it
-- Weekend columns are subtly dimmed (`opacity-70`) to visually separate study days from rest days
+- Add unlimited items to any day — just hit `Enter`
+- Click any item to remove it instantly
+- Weekend columns are subtly dimmed to visually separate study days from rest days
 
-### 03 — EXAMS
-Deadline and progress tracking for everything that counts toward your grade.
+### 03 — Exams
+Deadline and progress tracking for anything that affects your grade.
 
-- Add **Exams**, **Assignments**, or **Projects**, each tagged with a bold type label
-- Every entry gets a **clickable progress bar** — click to cycle through 0% → 25% → 50% → 75% → 100% → reset, no sliders or forms needed
-- Designed for at-a-glance scanning: title, type, and completion state all visible without opening anything
+- Log exams, assignments, or projects, each with a clear type label
+- Every entry gets a clickable progress bar that cycles 0% → 25% → 50% → 75% → 100% → reset — no sliders, no forms
+- Built for at-a-glance scanning: title, type, and status all visible without opening anything
 
-### 04 — HABITS
+### 04 — Habits
 Because grades aren't the only thing worth tracking.
 
-- Add custom habits (water intake, reading, workouts, whatever matters to you)
-- Each habit tracks a **live streak counter** that increments/decrements as you check it off
-- **Scratchpad** — a distraction-free, full-height notes panel for brain-dumping thoughts without leaving the app
-- **"Get Daily Inspiration"** button surfaces a full-screen motivational quote overlay — click anywhere to dismiss
+- Add custom habits — water intake, reading, workouts, whatever matters to you
+- Each habit keeps a live streak counter
+- **Scratchpad** — a full-height, distraction-free notes panel for dumping thoughts without leaving the app
+- **Daily Inspiration** button surfaces a full-screen motivational quote — click anywhere to dismiss
 
-### 05 — RELAX
-Because burnout isn't a productivity strategy. A dedicated recovery suite:
+### 05 — Relax
+Burnout isn't a strategy. A dedicated recovery suite:
 
 | Tool | What it does |
 |---|---|
-| **Pomodoro Timer** | Classic 25-min work / 5-min break cycles with play, pause, and reset |
-| **4-7-8 Breathing** | A guided breathing circle that visually expands/contracts on a 4s inhale → 7s hold → 8s exhale cycle, looping automatically |
-| **5-4-3-2-1 Grounding** | An interactive sensory-grounding checklist for anxiety/stress reset, rooted in a well-known mindfulness technique |
-| **Zen Focus** | A hypnotic, continuously morphing black blob animation (CSS `border-radius` keyframes) for ambient, screen-based meditation |
+| **Pomodoro Timer** | 25-minute work / 5-minute break cycles with play, pause, and reset |
+| **4-7-8 Breathing** | A guided breathing circle that expands and contracts on a 4s inhale → 7s hold → 8s exhale loop |
+| **5-4-3-2-1 Grounding** | An interactive sensory checklist for anxiety and stress reset |
+| **Zen Focus** | A slow, morphing black-blob animation for ambient, screen-based meditation |
 
 ---
 
@@ -80,12 +79,12 @@ Because burnout isn't a productivity strategy. A dedicated recovery suite:
 
 | Layer | Choice | Why |
 |---|---|---|
-| Markup | HTML5 | Zero build tooling — works by double-clicking the file |
-| Styling | Tailwind CSS (CDN) | Fast utility-first styling, no compiler step |
-| Interactivity | Vanilla JavaScript | No framework overhead, no dependencies to break |
-| Typography | Google Fonts — Bebas Neue + Inter | Editorial, poster-like visual identity |
+| Markup | HTML5 | Zero build tooling — works by just opening the file |
+| Styling | Tailwind CSS (CDN) | Utility-first, no compiler step |
+| Interactivity | Vanilla JavaScript | No framework overhead, nothing to break |
+| Typography | Google Fonts — Bebas Neue + Inter | The editorial, poster-like identity |
 
-**No npm install. No build step. No server. Just open `index.html`.**
+**No npm install. No build step. No server. Just `index.html`.**
 
 ---
 
@@ -98,20 +97,20 @@ cd Chronos-Workspace-Study-Agent
 
 Then either:
 
-- **Double-click `index.html`** to open it straight in your browser, or
+- **Double-click `index.html`** to open it in your browser, or
 - **Serve it locally** for a cleaner dev experience:
   ```bash
   python3 -m http.server 8000
   ```
-  Visit `http://localhost:8000`
+  Then visit `http://localhost:8000`
 
-That's it. No `npm install`, no `.env` file, no config.
+That's the whole process — no `npm install`, no `.env`, no config.
 
 ---
 
-## 🌐 Deploy It Free
+## 🌐 Deploying
 
-Since Chronos is 100% static, you can ship it live in under 2 minutes
+Chronos is 100% static, so it can be live on the web in under two minutes on any static host — Netlify, Vercel, or GitHub Pages all work out of the box.
 
 ---
 
@@ -120,18 +119,24 @@ Since Chronos is 100% static, you can ship it live in under 2 minutes
 ```
 chronos-workspace/
 ├── index.html      # The entire application — markup, styles, and logic
-├── README.md        # You are here
-├── LICENSE           # MIT
+├── README.md       # You are here
+├── LICENSE         # MIT
 └── .gitignore
 ```
 
 ---
 
-## 🔮 Roadmap Ideas
+## 🔮 What's Next
 
-Chronos currently runs entirely in-memory — refreshing the page resets your data. That's intentional for v1 (zero setup, zero accounts), but natural next steps include:
+Chronos currently runs in-memory, so refreshing the page resets your data. That's intentional for v1 — zero setup, zero accounts — but persistence (local storage or an optional account layer) is a natural next step.
 
-Contributions and forks are welcome — this is meant to be a starting point, not a finished product.
+Contributions and forks are welcome. This is meant to be a starting point, not a finished product.
+
+---
+
+<p align="center"><strong>Built for people who'd rather work than manage their to-do app.</strong></p>
+
+<p align="center"><em>An artwork by Team Privil —thank you for reading this far.</em></p>
 
 ## 😁 Heart for anyone reading down this
 ```
@@ -165,11 +170,3 @@ Contributions and forks are welcome — this is meant to be a starting point, no
 
 
 
-<p align="center">
-  <h2><b> An artwork by Team Privil — Thank you! </b></h2>
-</p>
-
----
----
-
-<p align="center"><strong>Built for people who'd rather work than manage their to-do app.</strong></p>
