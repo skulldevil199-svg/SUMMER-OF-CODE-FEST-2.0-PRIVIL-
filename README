@@ -81,7 +81,7 @@ Burnout isn't a strategy. A dedicated recovery suite:
 
 **No npm install. No build step. No server. Just `index.html`.**
 
-
+🔗 **Live Netlify Link {working site} :** ( https://chronos-by-privil.netlify.app/ )
 
 Then either:
 
@@ -115,7 +115,7 @@ chronos-workspace/
 
 Chronos currently runs in-memory, so refreshing the page resets your data. That's intentional for v1 — zero setup, zero accounts — but persistence (local storage or an optional account layer) is a natural next step.
 
-Contributions and forks are welcome to fill the following form . -->(https://docs.google.com/forms/d/e/1FAIpQLSdXiu_dQ9XG-ThfZBo4OHzSLAbn1i6O2izkCwBzYTYGuW4khQ/viewform?usp=publish-editor)<--
+Contributions and forks are welcome to fill the following form . --> (https://forms.gle/CxZMonvatSSh8uwE8) <--
  This is meant to be a starting point, not a finished product.
 
 
